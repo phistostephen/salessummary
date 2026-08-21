@@ -55,13 +55,13 @@ canvas{display:block;width:100%;height:auto;background:#fff;border-radius:7px}
 
         <div class="card">
           <div class="icon studded">💎</div>
-          <div class="field"><div class="card-name">Studded</div><label>Invoices</label><input id="studdedInvoices" type="number" value="12"></div>
+          <div class="field"><div class="card-name">Studded</div><label>Invoices</label><input id="studdedInvoices" type="number" value="0"></div>
           <div class="field"><div class="card-name">&nbsp;</div><label>Turnover</label><input id="studdedTurnover" value="₹0 L"></div>
         </div>
 
         <div class="card">
           <div class="icon silver">⚪</div>
-          <div class="field"><div class="card-name">Silver</div><label>Invoices</label><input id="silverInvoices" type="number" value="116"></div>
+          <div class="field"><div class="card-name">Silver</div><label>Invoices</label><input id="silverInvoices" type="number" value="0"></div>
           <div class="field"><div class="card-name">&nbsp;</div><label>Turnover</label><input id="silverTurnover" value="₹0 L"></div>
         </div>
       </div>
@@ -183,9 +183,9 @@ function downloadImage(){
 }
 function resetData(){
  document.getElementById("time").value="6:00 PM";
- document.getElementById("goldInvoices").value=267;document.getElementById("goldTurnover").value="₹3.25 Cr";
- document.getElementById("studdedInvoices").value=12;document.getElementById("studdedTurnover").value="₹18.50 L";
- document.getElementById("silverInvoices").value=116;document.getElementById("silverTurnover").value="₹9.20 L";
+ document.getElementById("goldInvoices").value=267;document.getElementById("goldTurnover").value="₹0 Cr";
+ document.getElementById("studdedInvoices").value=12;document.getElementById("studdedTurnover").value="₹0 L";
+ document.getElementById("silverInvoices").value=116;document.getElementById("silverTurnover").value="₹0 L";
  draw();
 }
 draw();
