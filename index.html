@@ -88,7 +88,8 @@ function amount(v){
   let n=parseFloat(v)||0;
   return v.includes("CR")?n:n/100;
 }
-function totalText(cr){return cr>=1?"₹"+cr.toFixed(2)+" Cr":"₹"+(cr*100).toFixed(2)+" L"}
+//function totalText(cr){return cr>=1?"₹"+cr.toFixed(2)+" Cr":"₹"+(cr*100).toFixed(2)+" L"}
+function totalText(cr){return "₹"+cr.toFixed(2)+" Cr"}
 
 function icon(ctx,type,x,y){
   if(type==="gold"){
