@@ -38,7 +38,7 @@ canvas{display:block;width:100%;height:auto;background:#fff;border-radius:7px}
 <body>
 <div class="app">
   <div class="header">
-    <h1>Sales Summary Generator V1</h1>
+    <h1>Sales Summary Generator V1.1</h1>
     <span>Live preview • PNG export</span>
   </div>
 
@@ -46,15 +46,11 @@ canvas{display:block;width:100%;height:auto;background:#fff;border-radius:7px}
     <div class="panel">
       
       <div class="section-title">Raw Data</div>
-      <textarea id="rawData" placeholder="Paste raw data here..." style="width:100%; height:100px; margin-bottom:15px; border:1px solid #dfe3e8; border-radius:9px; padding:10px; font-family:inherit; font-size:13px;"></textarea>
-
-      <div class="field"><div class="card-name">KJ/FRCHS</div><label>KJ</label><input type="radio" name="switchkf" id="kj" checked class="radio" style="height: 15px;"></div>
-      <div class="field"><div class="card-name"></div><label>FRCHS</label><input type="radio" name="switchkf" id="frchs" class="radio" style="height: 15px;"></div>
+      <textarea id="rawData" placeholder="Paste raw data here (e.g. DIAMOND 2365 35.09 11:59PM 2026-11-01 JuelISFranchise)" style="width:100%; height:100px; margin-bottom:15px; border:1px solid #dfe3e8; border-radius:9px; padding:10px; font-family:inherit; font-size:13px;"></textarea>
 
       <div class="section-title">Summary Time</div>
       <div class="time-row"><input id="time" value="6:00 PM"></div>
-                
-
+              
       <div class="section-title">Sales Categories</div>
       <div class="cards">
         <div class="card">
@@ -90,11 +86,13 @@ canvas{display:block;width:100%;height:auto;background:#fff;border-radius:7px}
 </div>
 
 <script>
-const ids=["time","kj","frchs","goldInvoices","goldTurnover","studdedInvoices","studdedTurnover","silverInvoices","silverTurnover"];
+const ids=["time","goldInvoices","goldTurnover","studdedInvoices","studdedTurnover","silverInvoices","silverTurnover"];
 ids.forEach(id=>document.getElementById(id).addEventListener("input",draw));
 
 document.getElementById('rawData').addEventListener('input', function(e) {
     const lines = e.target.value.split('\n');
+    let hasSetTime = false;
+    
     lines.forEach(line => {
         if (!line.trim() || line.toUpperCase().includes('TOTAL')) return;
         
@@ -102,21 +100,27 @@ document.getElementById('rawData').addEventListener('input', function(e) {
         let invoices = 0;
         let turnoverRaw = 0;
         
-        // Using the requested logic to find invoice count and turnover
-        const match = line.trim().match(/^([A-Za-z\s]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)$/);
+        // Split by tabs or multiple spaces to handle the new 6-column format
+        let parts = line.trim().split(/\t+|\s{2,}/);
+        if (parts.length < 3) {
+            parts = line.trim().split(/\s+/);
+        }
         
-        if (match) {
-            category = match[1].trim().toUpperCase();
-            invoices = parseInt(match[2], 10) || 0;
-            turnoverRaw = parseFloat(match[3]) || 0;
-        } else {
-            // Fallback: If data format is slightly different, split by tabs or multiple spaces
-            const parts = line.trim().split(/\t+|\s{2,}/);
-            if(parts.length >= 2) {
-                category = parts[0].trim().toUpperCase();
-                invoices = parseInt(parts[1], 10) || 0;
-                turnoverRaw = parseFloat(parts[2]) || 0;
-            }
+        if (parts.length >= 3) {
+            category = parts[0].trim().toUpperCase();
+            invoices = parseInt(parts[1], 10) || 0;
+            turnoverRaw = parseFloat(parts[2]) || 0;
+        }
+        
+        // Check for time, date, and DB name (e.g. 11:59PM 2026-11-01 JuelISFranchise)
+        if (parts.length >= 6 && !hasSetTime) {
+            const timeStr = parts[3];
+            const dateStr = parts[4];
+            const dbName = parts[5];
+            
+            // Format: db name, time, date
+            document.getElementById('time').value = `${dbName}, ${timeStr}, ${dateStr}`;
+            hasSetTime = true;
         }
         
         // Map to inputs
@@ -209,9 +213,6 @@ function draw(){
  const totalCr=rows.reduce((a,r)=>a+amount(r[3]),0);
  var time=document.getElementById("time").value||"6:00 PM";
 
-  if (document.querySelector('input[id="kj"]:checked')?.value) time=`${time} @ KJ`;
-  if (document.querySelector('input[id="frchs"]:checked')?.value) time=`${time} @ FRCHS`;
-
  ctx.fillStyle="#222";ctx.font="bold 32px Arial";ctx.fillText(`Sales Summary (As on ${time})`,34,55);
  ctx.font="22px Arial";ctx.fillStyle="#333";
  ctx.fillText("Category",34,125);ctx.fillText("Invoices",510,125);ctx.fillText("Turnover",930,125);
@@ -235,7 +236,7 @@ function draw(){
 
 function downloadImage(){
  draw();const c=document.getElementById("canvas"),a=document.createElement("a");
- a.download="Sales-Summary-"+`${time}`+".png";
+ a.download="Sales-Summary-"+`${document.getElementById("time").value}`+".png";
  a.href=c.toDataURL("image/png");a.click();
 }
 function resetData(){
